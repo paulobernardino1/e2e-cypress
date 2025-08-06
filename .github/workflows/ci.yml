@@ -1,19 +1,43 @@
-name: CI - Basic Check
+name: CI - Cypress Tests
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - cypress-ci
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - cypress-ci
   workflow_dispatch:
 
 jobs:
-  basic-check:
+  cypress-run:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Run a basic script
-      run: echo "✅ Projeto está ativo e CI funcionando!"
+    - name: Basic status check
+      run: echo "✅ Projeto ativo e workflow rodando!"
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run Cypress tests
+      run: npx cypress run
+
+    - name: Upload Cypress videos and screenshots
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: cypress-videos-screenshots
+        path: |
+          cypress/videos
+          cypress/screenshots
